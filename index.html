@@ -2,14 +2,48 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Веб-квиз</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Веб Квиз</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            text-align: center;
+            padding: 20px;
+        }
+        button {
+            margin: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #6a11cb; /* Цвет кнопки */
+            color: white; /* Цвет текста кнопки */
+            border: none; /* Убираем рамку */
+            border-radius: 5px; /* Закругленные углы */
+            transition: background-color 0.3s; /* Плавный переход */
+        }
+        button:hover {
+            background-color: #2575fc; /* Цвет кнопки при наведении */
+        }
+    </style>
+</head>
+<body>
+    <h1 id="question">Загрузка вопроса...</h1>
+    <div id="options"></div>
+
     <script>
         let tg = window.Telegram.WebApp;
 
+        // Функция для загрузки вопросов
         function loadQuestions(category) {
-            fetch(`questions.json`)
-                .then(response => response.json())
+            fetch('questions.json') 
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
                 .then(data => {
                     const questions = data[category];
                     const question = questions[Math.floor(Math.random() * questions.length)];
@@ -26,19 +60,22 @@
                         };
                         optionsDiv.appendChild(button);
                     });
+                })
+                .catch(error => {
+                    console.error('Ошибка при загрузке вопросов:', error);
                 });
         }
 
+        // Функция для отправки ответа
         function sendAnswer(answer) {
             tg.sendData(JSON.stringify({ answer })); // Отправка ответа в бот
             alert(`Вы выбрали: ${answer}`); // Уведомление пользователя
         }
 
+        // Загрузка вопросов при инициализации
         tg.ready();
+        const category = new URLSearchParams(window.location.search).get('category'); // Получаем категорию из URL
+        loadQuestions(category); // Загружаем вопросы для выбранной категории
     </script>
-</head>
-<body>
-    <h1 id="question"></h1>
-    <div id="options"></div>
 </body>
 </html>
