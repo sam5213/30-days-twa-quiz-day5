@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Веб-квиз</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script>
+        let tg = window.Telegram.WebApp;
+
+        function loadQuestions(category) {
+            fetch(`questions.json`)
+                .then(response => response.json())
+                .then(data => {
+                    const questions = data[category];
+                    const question = questions[Math.floor(Math.random() * questions.length)];
+                    document.getElementById('question').innerText = question.question;
+
+                    // Отображение вариантов ответов
+                    const optionsDiv = document.getElementById('options');
+                    optionsDiv.innerHTML = ''; // Очистка предыдущих вариантов
+                    question.options.forEach(option => {
+                        const button = document.createElement('button');
+                        button.innerText = option;
+                        button.onclick = () => {
+                            sendAnswer(option); // Отправка выбранного ответа
+                        };
+                        optionsDiv.appendChild(button);
+                    });
+                });
+        }
+
+        function sendAnswer(answer) {
+            tg.sendData(JSON.stringify({ answer })); // Отправка ответа в бот
+            alert(`Вы выбрали: ${answer}`); // Уведомление пользователя
+        }
+
+        tg.ready();
+    </script>
+</head>
+<body>
+    <h1 id="question"></h1>
+    <div id="options"></div>
+</body>
+</html>
