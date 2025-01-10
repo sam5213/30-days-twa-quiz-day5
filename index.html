@@ -37,7 +37,7 @@
 
         // Функция для загрузки вопросов
         function loadQuestions(category) {
-            fetch('questions.json') 
+            fetch('questions.json')
                 .then(response => {
                     if (!response.ok) {
                         throw new Error('Network response was not ok');
@@ -45,10 +45,13 @@
                     return response.json();
                 })
                 .then(data => {
+                    if (!data[category]) {
+                        throw new Error(`Категория "${category}" не найдена`);
+                    }
                     const questions = data[category];
                     const question = questions[Math.floor(Math.random() * questions.length)];
                     document.getElementById('question').innerText = question.question;
-
+        
                     // Отображение вариантов ответов
                     const optionsDiv = document.getElementById('options');
                     optionsDiv.innerHTML = ''; // Очистка предыдущих вариантов
@@ -63,6 +66,7 @@
                 })
                 .catch(error => {
                     console.error('Ошибка при загрузке вопросов:', error);
+                    document.getElementById('question').innerText = 'Ошибка при загрузке вопросов.';
                 });
         }
 
